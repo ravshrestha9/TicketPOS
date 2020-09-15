@@ -40,6 +40,8 @@ userSchema.statics.build = (attrs: UserAttrs) => {
 //Using function keyword instead of arrow function so that the 
 // value of this wouldn't be overridden in the function itself
 userSchema.pre('save', async function(done){
+ //Mongo considers password to be modified even if the user just 
+ //signed up
  if (this.isModified('password')){
   const hashed = await Password.toHash(this.get('password'));
   this.set('password', hashed);
