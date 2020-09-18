@@ -1,5 +1,6 @@
 import express, {Request, Response} from 'express';
 import {body} from 'express-validator';
+import jwt from 'jsonwebtoken';
 
 import {User} from '../models/user';
 import { validateRequest } from '../middlewares/validate-request';
@@ -24,6 +25,23 @@ async (req: Request, res: Response)=>{
  }
 
  const passwordsMatch = await Password.compare(existingUser.password, password); 
+
+ if (!passwordsMatch){
+  throw new BadRequestError("Invalid Credentials!!!");
+ }
+
+ // Generate JWT
+ const userJwt = jwt.sign({
+  id: existingUser.id,
+  email: existingUser.email
+ },process.env.JWT_KEY! );
+
+ // Store it on session object
+ req.session = {
+  jwt: userJwt
+ }
+
+ res.status(200).send(existingUser);
 });
 
 export {router as signinRouter};
