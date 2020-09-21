@@ -1,28 +1,34 @@
-import {MongoMemoryServer} from 'mongodb-memory-server';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import {app} from '../app';
+import { app } from '../app';
 
 let mongo: any;
-beforeAll(async()=>{
+beforeAll(async () => {
   process.env.JWT_KEY = 'asdf';
-  mongo = new MongoMemoryServer();
-  const mongoUri = await mongo.getUri();
 
-  await mongoose.connect(mongoUri, {
-   useNewUrlParser: true,
-   useUnifiedTopology: true
-  })
+  mongo = await MongoMemoryServer.create({ binary: { version: 'latest' } });
+  const mongoUri = mongo.getUri();
+
+  try {
+    await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+  } catch (error) {
+    console.error(error);
+  }
+  
 });
 
-beforeEach(async()=>{
- const collections = await mongoose.connection.db.collections();
+beforeEach(async () => {
+  const collections = await mongoose.connection.db.collections();
 
- for (let collection of collections){
-  await collection.deleteMany({});
- }
+  for (let collection of collections) {
+    await collection.deleteMany({});
+  }
 });
 
-afterAll(async()=>{
- await mongo.stop(); 
- await mongoose.connection.close();
+afterAll(async () => {
+  await mongo.stop();
+  await mongoose.connection.close();
 });
