@@ -1,23 +1,16 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { app } from '../app';
 
 let mongo: any;
+
 beforeAll(async () => {
+
   process.env.JWT_KEY = 'asdf';
 
-  mongo = await MongoMemoryServer.create({ binary: { version: 'latest' } });
-  const mongoUri = mongo.getUri();
-
-  try {
-    await mongoose.connect(mongoUri, {
+  await mongoose.connect(process.env.MONGO_URL as string, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-  } catch (error) {
-    console.error(error);
-  }
-  
 });
 
 beforeEach(async () => {
@@ -32,3 +25,4 @@ afterAll(async () => {
   await mongo.stop();
   await mongoose.connection.close();
 });
+
