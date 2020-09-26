@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import Router from 'next/router'
 import useRequest from '../../hooks/use-request';
 
 export default () => {
@@ -11,16 +11,18 @@ export default () => {
     body: {
       email,
       password
-    }
+    },
+    onSuccess: () => Router.push('/')
   });
 
   const onSubmit = async event => {
     event.preventDefault();
 
-    doRequest();
+    await doRequest();
   };
 
   return (
+   <div className="container">
     <form onSubmit={onSubmit}>
       <h1>Sign Up</h1>
       <div className="form-group">
@@ -43,5 +45,6 @@ export default () => {
       {errors}
       <button className="btn btn-primary">Sign Up</button>
     </form>
+    </div>
   );
 };
